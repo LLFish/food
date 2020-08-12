@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+<head>
+    <meta charset="UTF-8">
+    <title>Record</title>
+    <link rel="shortcut icon" href="#" />
+    <script type="application/javascript" src="vue.js"></script>
+    <script type="application/javascript" src="axios.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+</head>
+<body style="height: 100%; margin: 0">
+    <div id="container" style="height: 100%"></div>
+    <div id="assement" v-if=!today_exist style="text-align: center;font-size: 25px;">
+        <label>今日评价:</label><input type="text" id = "input_assement" name="assement" style="height: 25px;"/><br>
+        <input type="submit" name="Submit" value="提交" onclick="div_assement.submitAssement()" style="height: 25px;width: 250px;font-size: 15px;"/>
+    </div>
+</body>
+<script>
+    var div_container = new Vue({
+        el:'#container',
+        data:{
+            totalDays:0,
+            showData:[]
+        },
+        mounted(){
+            this.getTotalDays();
+            this.getShowData();
+            this.darwData();
+
+        },
+        methods:{
+            getAllRecords(){
+                this.getData("/records/all", data=>{
+                    this.records = data;
+                })
+            },
+
+            getTotalDays(){
+                this.getData("/records/daysInCurrentMonth", data=>{
+                    this.totalDays = data;
+                });
+            },
+
+            getShowData(){
+                this.getData(("/records/allInCurrentMounth"), data=>{
+                    for(var i of data){
+                        var tem = [i["x"], Number(i["y"])*(-1)+4, i["value"]];
+                        this.showData.push(tem);
+                    }
+                });
+            },
+
+            getData(url, callback){
+                axios.get(url).then(res=>{
+                    if(typeof  callback == "function"){
+                        callback(res.data);
+                    }
+                }).catch(err=>{
+                    console.log(err);
+                    alert(url + "  null");
+                });
+            },
+
+            //echarts 绘制
+            darwData(){
+                var dom = document.getElementById("container");
+                var myChart = echarts.init(dom);
+                var app = {}
+                option = null;
+                var hours = ['29', '22', '15', '8', '1'];
+                var days = ['周一', '周二', '周三',
+                    '周四', '周五', '周六', '周日'];
+
+                var data = this.showData;
+
+                data = data.map(function (item) {
+                    return [item[0], item[1], item[2] || '-'];
+                });
+
+                option = {
+                    tooltip: {
+                        position: 'top'
+                    },
+                    animation: true,
+                    grid: {
+                        height: '50%',
+                        top: '10%'
+                    },
+                    xAxis: {
+                        type: 'category',
+                        data: days,
+                        splitArea: {
+                            show: true
+                        }
+                    },
+                    yAxis: {
+                        type: 'category',
+                        data: hours,
+                        splitArea: {
+                            show: true
+                        }
+                    },
+                    visualMap: {
+                        min: 0,
+                        max: 10,
+                        calculable: true,
+                        orient: 'horizontal',
+                        left: 'center',
+                        bottom: '15%'
+                    },
+                    visualMap: {
+                        min: 0,
+                        max: 5,
+                        type: 'piecewise',
+                        orient: 'horizontal',
+                        left: 'center',
+                        top: 0,
+                        textStyle: {
+                            color: '#000'
+                        }
+                    },
+                    series: [{
+                        name: 'Punch Card',
+                        type: 'heatmap',
+                        data: data,
+                        label: {
+                            show: true
+                        },
+                        emphasis: {
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }]
+                };;
+                if (option && typeof option === "object") {
+                    myChart.setOption(option, true);
+                }
+            }
+        },
+        watch:{
+            showData(){
+                this.darwData();
+            }
+        }
+    });
+    var div_assement = new Vue({
+        el:'#assement',
+        data:{
+            today_exist:true,
+        },
+        mounted(){
+            this.getTodayState();
+        },
+        methods:{
+            submitAssement(){
+                var post_data = {assessment:input_assement.value};
+                axios.post("/records/record", post_data).then(res=>{
+                    var correnct = res.data;
+                    if(correnct){
+                        window.location.href="record.html";
+                    }
+                    else{
+                        alert("添加出错");
+                        window.location.href="record.html";
+                    }
+                }).catch(err=>{
+                    console.error(err);
+                });
+            },
+
+            getTodayState(){
+                div_container.getData("/records/today_exist", data=>{
+                    this.today_exist = data;
+                })
+            }
+        }
+    });
+</script>
+</html>

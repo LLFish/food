@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script type="application/javascript" src="axios.min.js"></script>
+    <meta charset="UTF-8">
+    <title>小目标+1</title>
+    <style>
+        #allin{width:500px;text-align:center;font-size: 25px;}
+        input{height: 27px;}
+        .lab{width: 150px;text-align: left}
+    </style>
+</head>
+<body style="text-align:center">
+    <div id="allin">
+        <div class="lab">想吃的:</div><input type="text" id = "input_name" name="food_name"/><br>
+        <div class="lab">描述:</div>  <input type="text" id = "input_desc" name="food_description"/><br>
+        <input type="submit" name="Submit" value="提交" onclick="check_login()"/>
+        <input type="reset" name="Reset" value="清除" onclick="reset()"/>
+    </div>
+</body>
+<script>
+    function check_login() {
+        var post_data = {name:input_name.value, other_infomation:input_desc.value};
+        axios.post("/foods/food", post_data).then(res=>{
+            var correct = res.data;
+            if(correct){
+                window.location.href="index.html";
+            }
+            else{
+                alert("添加出错");
+                window.location.href="index.html";
+            }
+        }).catch(err=>{
+            console.error(err);
+        });
+    }
+    function reset() {
+        input_name.value = "";
+        input_desc.value = "";
+    }
+</script>
+</html>

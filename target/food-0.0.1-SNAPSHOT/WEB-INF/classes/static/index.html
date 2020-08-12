@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!--    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>-->
+<!--    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>-->
+    <script type="application/javascript" src="vue.js"></script>
+    <script type="application/javascript" src="axios.min.js"></script>
+    <title>欢总的饲料计划</title>
+    <style>
+        #div1{text-align:center;font-size:35px;}
+        #button_login{text-align:left;font-size:25px;margin-right: 20px;}
+        #showType_select{text-align:right;font-size:25px;margin-left:20px;height:40px;}
+    </style>
+</head>
+<body>
+    <div id="div1">
+<!--        主要信息展示-->
+        <table id="table_main" border=1 cellspacing=0 width="100%">
+            <tr>
+                <td></td>
+                <td>想吃的</td>
+                <td>描述</td>
+                <td>时间</td>
+                <td>完成</td>
+            </tr>
+            <tr v-for="(food,index) in foods">
+                <td align="center">{{index+1}}</td>
+                <td align="center">{{food.name}}</td>
+                <td align="center">{{food.other_infomation}}</td>
+                <td align="center">{{food.create_time}}</td>
+                <td align="center">{{food.finished}}</td>
+            </tr>
+        </table>
+<!--        登陆框-->
+        <a href="Login.html"> <button id="button_login">登陆</button> </a>
+<!--        显示信息类型选项框-->
+        <select id="showType_select" v-model="foodShowType" >
+            <option v-for="foodShowType in foodShowTypes" v-bind:value="foodShowType">{{foodShowType.name}}</option>
+        </select>
+    </div>
+
+</body>
+<script>
+    var div1 = new Vue({
+        el:'#div1',
+        data:{
+            foods:[],
+            foodShowTypes:[{name:"还没恰",id:0}, {name:"恰过了",id:1}, {name:"所有的",id:2}],
+            foodShowType:{name:"所有的",id:2}  //0没有完成，1完成，2所有
+        },
+        mounted(){
+            this.loadFoods();
+        },
+        methods:{
+            loadFoods(){
+                switch (this.foodShowType.id) {
+                    case 0: {
+                        this.getFoods("/foods?finished=否");
+                    } break;
+                    case 1: {
+                        this.getFoods("/foods?finished=是");
+                    } break;
+                    case 2: {
+                        this.getFoods("/foods/all");
+                    } break;
+                }
+            },
+
+            getFoods(goalRoute){
+                axios.get(goalRoute).then(res=>{
+                    this.foods = res.data;
+                }).catch(err=>{
+                    console.error(err);
+                });
+            }
+        },
+        watch:{
+            foodShowType(value){
+                this.loadFoods();
+            }
+        }
+    });
+</script>
+</html>
