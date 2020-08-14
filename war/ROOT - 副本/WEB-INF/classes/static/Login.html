@@ -1,0 +1,37 @@
+<head>
+    <meta charset="UTF-8">
+    <script type="application/javascript" src="js/axios.min.js"></script>
+    <title>Login</title>
+    <style>
+        #all{width:100%;font-size:25px;margin: 0 auto;text-align:center;}
+        #combine{width:300px; text-align:right;}
+        #passwd{width:150px; height:30px;}
+    </style>
+</head>
+<body>
+<div id=all>
+    <div id=combine>
+            密码: <input type="password" id="passwd"  name="passwd"/><br>
+            <input type="submit" name="Submit" value="提交" onclick="check_login()"/>
+            <input type="reset" name="Reset" value="清除" onclick="reset()"/>
+    </div>
+</div>
+<script>
+    function check_login() {
+        axios.get("/login?password="+passwd.value).then(res=>{
+            var correct = res.data;
+            if(correct){
+                window.location.href="user_operation.html";
+            }
+            else{
+                alert("密码错误");
+            }
+        }).catch(err=>{
+            console.error(err);
+        });
+    }
+    function reset() {
+        passwd.value = "";
+    }
+</script>
+</body>

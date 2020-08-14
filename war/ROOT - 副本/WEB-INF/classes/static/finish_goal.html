@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script type="application/javascript" src="js/vue.js"></script>
+    <script type="application/javascript" src="js/axios.min.js"></script>
+    <meta charset="UTF-8">
+    <title>完成小目标</title>
+    <style>
+        #div1{text-align:center;font-size:35px;}
+        #button_return{text-align:left;font-size:25px;margin-right: 20px;}
+        #button_delete{text-align:center;font-size:10px;width: 80%;height: 30px;}
+    </style>
+</head>
+<body>
+<div id="div1">
+    <!--        主要信息展示-->
+    <table id="table_main" border=1 cellspacing=0 width="100%">
+        <tr align="center">
+            <td>想吃的</td>
+            <td>描述</td>
+            <td>时间</td>
+            <td>完成</td>
+        </tr>
+        <tr v-for="(food,index) in foods">
+            <td align="center">{{food.name}}</td>
+            <td align="center">{{food.other_infomation}}</td>
+            <td align="center">{{food.create_time}}</td>
+            <td align="center"> <button id="button_delete" @click="finishGoal(food.id)">完成</button> </td>
+        </tr>
+    </table>
+    <!--    返回  -->
+    <a href="index.html"> <button id="button_return">返回</button> </a>
+</div>
+</body>
+<script>
+    var div1 = new Vue({
+        el:'#div1',
+        data:{
+            foods:[],
+        },
+
+        mounted(){
+            this.getFoodsNotFinished();
+        },
+
+        methods:{
+
+            getFoodsNotFinished(){
+                axios.get("/foods?finished=否").then(res=>{
+                    this.foods = res.data;
+                }).catch(err=>{
+                    console.error(err);
+                });
+            },
+
+            chooseNot(){
+                this.id_finish = -1;
+            },
+
+            finishGoal(id_finished){
+                axios.put("/foods/food/"+id_finished+"?finished=是").then(res=>{
+                    this.getFoodsNotFinished();
+                }).catch(err=>{
+                    console.error(err);
+                });
+            }
+
+        },
+
+        watch:{
+        }
+    });
+</script>
+</html>
