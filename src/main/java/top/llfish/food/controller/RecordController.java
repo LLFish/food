@@ -64,6 +64,12 @@ public class RecordController {
         return RecordDTO.getDaysBefor();
     }
 
+    @GetMapping("/access_count")
+    public int getAccessRecord(String name){
+        int count = 0;
+        return 0;
+    }
+
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json", path = "/record")
     public boolean addRecord(@RequestBody Record currentRecord){
         currentRecord.setDateToday();

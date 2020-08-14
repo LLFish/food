@@ -2,7 +2,7 @@
   <artifact type="war" name="ROOT">
     <output-path>$PROJECT_DIR$/war</output-path>
     <root id="archive" name="ROOT.war">
-      <element id="artifact" artifact-name="food:war" />
+      <element id="artifact" artifact-name="food:war exploded" />
     </root>
   </artifact>
 </component>
